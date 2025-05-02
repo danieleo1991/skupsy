@@ -62,7 +62,12 @@ Zwróć tylko czysty JSON. Nic więcej.`
     let wynik;
 
     try {
-      wynik = JSON.parse(content);
+      const match = content.match(/{[\s\S]*}/);
+	  if (match) {
+		wynik = JSON.parse(match[0]);
+	  } else {
+		throw new Error("Nie znaleziono żadnego JSON-a w treści");
+	  }
     } catch (e) {
       console.error("❗ Błąd parsowania JSON:", e.message);
       wynik = { error: "Nie udało się sparsować odpowiedzi GPT jako JSON." };
