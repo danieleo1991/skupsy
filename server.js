@@ -46,7 +46,7 @@ Wynik zwróć w **czystym formacie JSON**:
 
 {
   "status": "true jeśli masz pewność co to za przedmiot lub false jeśli nie masz",
-  "product_name": "nazwa przedmiotu",
+  "product_name": "dokładna nazwa przedmiotu",
   "product_category_name": "główna kategoria, np. Elektronika",
   "product_my_price": "np. 250",
   "definitely": "liczba od 1 do 10 włącznie określająca jak bardzo jesteś pewien",
