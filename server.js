@@ -83,8 +83,6 @@ Zwróć tylko ten JSON. Żadnych opisów ani komentarzy.`
       console.error("❗ Błąd parsowania JSON:", e.message);
       wynik = { error: "Nie udało się sparsować odpowiedzi GPT jako JSON." };
     }
-
-    res.send({ wynik });
 	
 	await axios.post("https://stepmedia.pl/skupsy/app/quotation.php", {
 		secret: "777",
@@ -95,6 +93,8 @@ Zwróć tylko ten JSON. Żadnych opisów ani komentarzy.`
 		condition: wynik.condition,
 		status: wynik.status
 	});
+
+    res.send({ wynik });
 
   } catch (error) {
     console.error("❌ Błąd serwera:", error?.message || error);
