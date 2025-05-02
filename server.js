@@ -49,7 +49,8 @@ Wynik zwróć w **czystym formacie JSON**:
   "product_name": "nazwa przedmiotu",
   "product_category_name": "główna kategoria, np. Elektronika",
   "product_my_price": "np. 250",
-  "definitely": "liczba od 1 do 10 określająca jak bardzo jesteś pewien"
+  "definitely": "liczba od 1 do 10 określająca jak bardzo jesteś pewien",
+  "condition": "liczba od 1 do 10 określająca stan przedmiotu"
 }
 
 Zwróć tylko ten JSON. Żadnych opisów ani komentarzy.`
