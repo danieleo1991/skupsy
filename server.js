@@ -39,10 +39,10 @@ app.post("/app", upload.single("image"), async (req, res) => {
               text: `Jesteś generatorem JSON. Na podstawie zdjęcia określ, co to za przedmiot i podaj wynik w **czystym** formacie JSON (bez żadnego komentarza, opisu, ani dodatkowego tekstu):
 
 {
+  "status": "Tutaj wpisz true jeśli masz pewność co to za przedmiot lub false jeśli nie masz pewności",
   "product_name": "Tutaj wpisz nazwę przedmiotu",
   "product_my_price": "Tutaj wpisz kwotę np. 250 zł"
 }
-
 Zwróć tylko czysty JSON. Nic więcej.`
             },
             {
@@ -58,7 +58,6 @@ Zwróć tylko czysty JSON. Nic więcej.`
     });
 
     const content = response.choices[0].message.content;
-	console.log(content);
     let wynik;
 
     try {
