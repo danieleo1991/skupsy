@@ -4,7 +4,6 @@ const cors = require("cors");
 const axios = require("axios");
 const multer = require("multer");
 const fs = require("fs");
-const qs = require("qs");
 const { OpenAI } = require("openai");
 
 const app = express();
@@ -85,23 +84,15 @@ Zwróć tylko ten JSON. Żadnych opisów ani komentarzy.`
       wynik = { error: "Nie udało się sparsować odpowiedzi GPT jako JSON." };
     }
 	
-	await axios.post(
-		"https://stepmedia.pl/skupsy/app/quotation.php",
-		qs.stringify({
-			secret: "777",
-			product_name: wynik.product_name,
-			product_category_name: wynik.product_category_name,
-			product_my_price: wynik.product_my_price,
-			definitely: wynik.definitely,
-			condition: wynik.condition,
-			status: wynik.status
-		}),
-		{
-			headers: {
-			  "Content-Type": "application/x-www-form-urlencoded"
-			}
-		}
-	);
+	await axios.post("https://stepmedia.pl/skupsy/app/quotation.php", {
+		secret: "777",
+		product_name: wynik.product_name,
+		product_category_name: wynik.product_category_name,
+		product_my_price: wynik.product_my_price,
+		definitely: wynik.definitely,
+		condition: wynik.condition,
+		status: wynik.status
+	});
 
     res.send({ wynik });
 
