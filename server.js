@@ -1,4 +1,3 @@
-require("dotenv").config();
 const express = require("express");
 const multer = require("multer");
 const fs = require("fs");
@@ -8,7 +7,7 @@ const app = express();
 const upload = multer({ dest: "uploads/" });
 const openai = new OpenAI({ apiKey: "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" });
 
-app.post("/wycena", upload.single("image"), async (req, res) => {
+app.post("/app", upload.single("image"), async (req, res) => {
     if (!req.file) return res.status(400).send("Brak zdjęcia.");
 
     try {
@@ -27,7 +26,7 @@ app.post("/wycena", upload.single("image"), async (req, res) => {
                         {
                             type: "image_url",
                             image_url: {
-                                url: data:${mimeType};base64,${imageData},
+                                url: `data:${mimeType};base64,${imageData}`
                             },
                         },
                     ],
