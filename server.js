@@ -30,14 +30,27 @@ app.post("/app", upload.single("image"), async (req, res) => {
     const imageData = fs.readFileSync(req.file.path, { encoding: "base64" });
 	const imageHash = crypto.createHash("sha1").update(imageData).digest("hex");
     const mimeType = req.file.mimetype;
+	
+	try {
+		const check = await axios.post("https://stepmedia.pl/skupsy/app/check-hash-image.php", {
+			secret: "777",
+			image_hash: imageHash
+		});
+		if (check.data.status === "found") {
+			return res.send({ wynik: check.data.wynik });
+		}
+	}
+	catch (err) {
+		console.error("❌ Błąd sprawdzania hasha:", err.message);
+    }
 
     const response = await openai.chat.completions.create({
-     model: "gpt-4.1-mini",
-	 temperature: 0,
-      messages: [
-        {
-          role: "user",
-          content: [
+		model: "gpt-4.1-mini",
+		temperature: 0,
+		messages: [
+		{
+			role: "user",
+			content: [
             {
               type: "text",
               text: `Jesteś generatorem JSON i pracownikiem lombardu. Na podstawie zdjęcia oceń, co to za przedmiot. Następnie oszacuj jego wartość rynkową jako używanego, i określ za jaką kwotę lombard mógłby go odkupić (z marżą — czyli 50% wartości rynkowej używanego przedmiotu, bez wyjątku. Nie zaokrąglaj do przedziałów ani pełnych setek). 
