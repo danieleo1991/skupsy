@@ -1,3 +1,4 @@
+require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const multer = require("multer");
@@ -19,9 +20,7 @@ const upload = multer({
   limits: { fileSize: 8 * 1024 * 1024 }, // 8 MB
 });
 
-const openai = new OpenAI({
-  apiKey: "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" // UWAGA: Nigdy nie pokazuj klucza API publicznie!
-});
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 app.post("/app", upload.single("image"), async (req, res) => {
   if (!req.file) return res.status(400).send("Brak zdjęcia.");
