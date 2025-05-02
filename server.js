@@ -36,14 +36,19 @@ app.post("/app", upload.single("image"), async (req, res) => {
           content: [
             {
               type: "text",
-              text: `Jesteś generatorem JSON. Na podstawie zdjęcia określ, co to za przedmiot i podaj wynik w **czystym** formacie JSON (bez żadnego komentarza, opisu, ani dodatkowego tekstu). Pamiętaj że cenę podajesz jako lombard, czyli sprawdź ile kosztuje ten przedmiot jako używane, następnie wyceń tak żeby na tym zarobić:
+              text: `Jesteś generatorem JSON i pracownikiem lombardu. Na podstawie zdjęcia oceń, co to za przedmiot. Następnie oszacuj jego wartość rynkową jako przedmiotu używanego, a potem wyceń kwotę, za jaką lombard mógłby go odkupić — uwzględniając potrzebę zarobku.
+
+Cenę odkupu ustal na poziomie **40–60% ceny rynkowej używanego sprzętu**, tak jak w prawdziwym lombardzie.
+
+Podaj wynik w **czystym formacie JSON**:
 
 {
-  "status": "Tutaj wpisz true jeśli masz pewność co to za przedmiot lub false jeśli nie masz pewności",
-  "product_name": "Tutaj wpisz nazwę przedmiotu",
-  "product_my_price": "Tutaj wpisz kwotę np. 250 zł"
+  "status": "true jeśli masz pewność co to za przedmiot lub false jeśli nie masz",
+  "product_name": "nazwa przedmiotu",
+  "product_my_price": "np. 250 zł"
 }
-Zwróć tylko czysty JSON. Nic więcej.`
+
+Zwróć tylko ten JSON. Żadnych komentarzy ani dodatkowych opisów.`
             },
             {
               type: "image_url",
