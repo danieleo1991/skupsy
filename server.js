@@ -29,7 +29,7 @@ app.post("/app", upload.single("image"), async (req, res) => {
     const mimeType = req.file.mimetype;
 
     const response = await openai.chat.completions.create({
-      model: "gpt-4-turbo", // Użyj poprawnej nazwy modelu z vision
+     model: "gpt-4.1-mini",
       messages: [
         {
           role: "user",
