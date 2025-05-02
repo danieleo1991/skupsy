@@ -35,7 +35,7 @@ app.post("/app", upload.single("image"), async (req, res) => {
         {
           role: "user",
           content: [
-            { type: "text", text: "Oceń buta na zdjęciu i podaj szacunkową cenę rynkową w złotówkach. Jeśli to możliwe, podaj markę i model." },
+            { type: "text", text: "Prowadzę lombard. Oszacuj potencjał sprzedażowy tego produktu ze zdjęcia. Wyświetl kwotę, za którą mogę ja - jako skup - zakupić ten przedmiot. Nic poza kwotą nie wyświetlaj." },
             {
               type: "image_url",
               image_url: {
