@@ -49,12 +49,21 @@ app.post("/app", upload.single("image"), async (req, res) => {
     });
 
     res.send({ wynik: response.choices[0].message.content });
-  } catch (error) {
-    console.error(error);
+  }
+  catch (error) {
+    console.error("❌ Błąd serwera:", error?.message || error);
+    if (error?.response?.data) {
+      console.error("📦 Szczegóły odpowiedzi OpenAI:", error.response.data);
+    }
     res.status(500).json({ error: "Błąd przetwarzania obrazu." });
-  } finally {
+  }
+  finally {
     fs.unlinkSync(req.file.path);
   }
+});
+
+app.get("/test", (req, res) => {
+  res.send("Serwer działa, OPENAI_API_KEY: " + (process.env.OPENAI_API_KEY ? "OK" : "BRAK"));
 });
 
 // 👇 Jeśli masz inne JSON API — uruchom parsowanie dopiero tu
