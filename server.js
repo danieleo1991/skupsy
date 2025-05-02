@@ -1,6 +1,7 @@
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
+const axios = require("axios");
 const multer = require("multer");
 const fs = require("fs");
 const { OpenAI } = require("openai");
@@ -84,6 +85,16 @@ Zwróć tylko ten JSON. Żadnych opisów ani komentarzy.`
     }
 
     res.send({ wynik });
+	
+	await axios.post("https://stepmedia.pl/skupsy/app/quotation.php", {
+		secret: "777",
+		product_name: wynik.product_name,
+		product_category_name: wynik.product_category_name,
+		product_my_price: wynik.product_my_price,
+		definitely: wynik.definitely,
+		condition: wynik.condition,
+		status: wynik.status
+	});
 
   } catch (error) {
     console.error("❌ Błąd serwera:", error?.message || error);
