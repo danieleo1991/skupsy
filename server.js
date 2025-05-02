@@ -23,7 +23,7 @@ const upload = multer({
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 app.post("/app", upload.single("image"), async (req, res) => {
-  if (!req.file) return res.status(400).send("Brak zdjęcia.");
+  if (!req.file) return res.status(400).json({ error: "Brak zdjęcia." });
 
   try {
     const imageData = fs.readFileSync(req.file.path, { encoding: "base64" });
@@ -51,7 +51,7 @@ app.post("/app", upload.single("image"), async (req, res) => {
     res.send({ wynik: response.choices[0].message.content });
   } catch (error) {
     console.error(error);
-    res.status(500).send("Błąd przetwarzania obrazu.");
+    res.status(500).json({ error: "Błąd przetwarzania obrazu." });
   } finally {
     fs.unlinkSync(req.file.path);
   }
