@@ -30,6 +30,7 @@ app.post("/app", upload.single("image"), async (req, res) => {
 
     const response = await openai.chat.completions.create({
      model: "gpt-4.1-mini",
+	 temperature: 0,
       messages: [
         {
           role: "user",
