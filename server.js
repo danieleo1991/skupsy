@@ -10,6 +10,8 @@ app.use(cors({
 	methods: ['GET', 'POST', 'PUT', 'DELETE'],
 	credentials: false
 }));
+app.use(express.json({ limit: "10mb" }));
+app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 app.use(express.json());
 const upload = multer({ dest: "uploads/" });
 const openai = new OpenAI({ apiKey: "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" });
