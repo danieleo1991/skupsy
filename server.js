@@ -58,7 +58,7 @@ Zwróć tylko czysty JSON. Nic więcej.`
     });
 
     const content = response.choices[0].message.content;
-	console.log(content);
+	console.log(response);
     let wynik;
 
     try {
