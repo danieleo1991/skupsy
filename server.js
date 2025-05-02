@@ -30,7 +30,7 @@ app.post("/app", upload.single("image"), async (req, res) => {
     const mimeType = req.file.mimetype;
 
     const response = await openai.chat.completions.create({
-      model: "gpt-4-vision-preview",
+      model: "gpt-4-turbo",
       messages: [
         {
           role: "user",
