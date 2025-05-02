@@ -3,6 +3,7 @@ const express = require("express");
 const cors = require("cors");
 const axios = require("axios");
 const multer = require("multer");
+const crypto = require("crypto");
 const fs = require("fs");
 const { OpenAI } = require("openai");
 
@@ -27,6 +28,7 @@ app.post("/app", upload.single("image"), async (req, res) => {
 
   try {
     const imageData = fs.readFileSync(req.file.path, { encoding: "base64" });
+	const imageHash = crypto.createHash("sha1").update(imageData).digest("hex");
     const mimeType = req.file.mimetype;
 
     const response = await openai.chat.completions.create({
@@ -86,6 +88,7 @@ Zwróć tylko ten JSON. Żadnych opisów ani komentarzy.`
 	
 	await axios.post("https://stepmedia.pl/skupsy/app/quotation.php", {
 		secret: "777",
+		image_hash: imageHash,
 		product_name: wynik.product_name,
 		product_category_name: wynik.product_category_name,
 		product_my_price: wynik.product_my_price,
