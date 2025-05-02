@@ -1,77 +1,102 @@
-<?php
+require("dotenv").config();
+const express = require("express");
+const cors = require("cors");
+const multer = require("multer");
+const fs = require("fs");
+const { OpenAI } = require("openai");
 
-	if (!$IS_DEFINED) die;
+const app = express();
 
-$JS_SCRIPTS .= '
-<script>
-	// Obsługa automatycznego submitu po zrobieniu zdjęcia aparatem
-	document.getElementById("cameraInput").addEventListener("change", function () {
-		if (this.files.length > 0) {
-			document.getElementById("form").requestSubmit();
-		}
-	});
+// CORS dla frontendu
+app.use(cors({
+  origin: 'https://stepmedia.pl',
+  methods: ['GET', 'POST'],
+  credentials: false
+}));
 
-	// Obsługa automatycznego submitu po wybraniu pliku z galerii (drugi input)
-	document.getElementById("galleryInput").addEventListener("change", function () {
-		if (this.files.length > 0) {
-			document.getElementById("form").requestSubmit();
-		}
-	});
+const upload = multer({
+  dest: "uploads/",
+  limits: { fileSize: 8 * 1024 * 1024 }, // 8 MB
+});
 
-	// Obsługa wysyłki formularza
-	document.getElementById("form").onsubmit = async (e) => {
-		e.preventDefault();
-		$("#result").html("<h1>Wyceniam Twój przedmiot. Daj mi chwilę...</h1>");
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-		try {
-			const formData = new FormData(e.target);
-			const res = await fetch("https://skupsy.onrender.com/app", {
-				method: "POST",
-				body: formData
-			});
-			const data = await res.json();
+app.post("/app", upload.single("image"), async (req, res) => {
+  if (!req.file) return res.status(400).json({ error: "Brak zdjęcia." });
 
-			if (data.wynik.status) {
-				console.log(data.wynik.product_category_name);
-				$("#result").html(
-					"<h2>" + data.wynik.product_name + "</h2>" +
-					"<h1>Gratulacje! Możemy odkupić od Ciebie ten przedmiot za <span>" +
-					data.wynik.product_my_price +
-					"</span> w ciągu <span>15 minut</span>!</h1>"
-				);
-			} else {
-				$("#result").html("❌ Nie mogę rozpoznać tego przedmiotu. Zrób inne zdjęcie.");
-			}
-		}
-		catch (err) {
-			console.error(err);
-			$("#result").html("❌ Błąd. Spróbuj później.");
-		}
-	};
-</script>
-';
+  try {
+    const imageData = fs.readFileSync(req.file.path, { encoding: "base64" });
+    const mimeType = req.file.mimetype;
 
-$CONTENT .= '
-<div class="container mt50 mb50">
-	<form id="form" enctype="multipart/form-data">
-		<!-- Ukryty input dla aparatu -->
-		<input id="cameraInput" type="file" name="image" accept="image/*" capture="environment" style="display:none;"  />
+    const response = await openai.chat.completions.create({
+     model: "gpt-4.1-mini",
+      messages: [
+        {
+          role: "user",
+          content: [
+            {
+              type: "text",
+              text: `Jesteś generatorem JSON i pracownikiem lombardu. Na podstawie zdjęcia oceń, co to za przedmiot. Następnie oszacuj jego wartość rynkową jako przedmiotu używanego, a potem wyceń kwotę, za jaką lombard mógłby go odkupić — uwzględniając potrzebę zarobku.
 
-		<!-- Przycisk otwierający aparat -->
-		<div>
-			<button type="button" onclick=\'document.getElementById("cameraInput").click();\'>Zrób zdjęcie</button>
-		</div>
+Cenę odkupu ustal na poziomie 40–60% ceny rynkowej używanego sprzętu.
 
-		<div>lub...</div>
+Określ również kategorię główną przedmiotu (np. "Elektronika", "Samochód", "Biżuteria", "AGD", "Odzież", "Narzędzia", "Inne") i zwróć ją jako oddzielne pole.
 
-		<!-- Drugi input do galerii -->
-		<input id="galleryInput" type="file" name="image" accept="image/*"  />
+Podaj wynik w **czystym formacie JSON**:
 
-		<button type="submit">Wyceń</button>
-	</form>
+{
+  "status": "true jeśli masz pewność co to za przedmiot lub false jeśli nie masz",
+  "product_name": "nazwa przedmiotu",
+  "product_category_name": "główna kategoria, np. Elektronika",
+  "product_my_price": "np. 250 zł"
+}
 
-	<div id="result" class="result"></div>
-</div>
-';
+Zwróć tylko ten JSON. Żadnych opisów ani komentarzy.`
+            },
+            {
+              type: "image_url",
+              image_url: {
+                url: `data:${mimeType};base64,${imageData}`
+              }
+            }
+          ]
+        }
+      ],
+      max_tokens: 1000,
+    });
 
-?>
+    const content = response.choices[0].message.content;
+    let wynik;
+
+    try {
+      const match = content.match(/{[\s\S]*}/);
+	  if (match) {
+		wynik = JSON.parse(match[0]);
+	  } else {
+		throw new Error("Nie znaleziono żadnego JSON-a w treści");
+	  }
+    } catch (e) {
+      console.error("❗ Błąd parsowania JSON:", e.message);
+      wynik = { error: "Nie udało się sparsować odpowiedzi GPT jako JSON." };
+    }
+
+    res.send({ wynik });
+
+  } catch (error) {
+    console.error("❌ Błąd serwera:", error?.message || error);
+    if (error?.response?.data) {
+      console.error("📦 Szczegóły odpowiedzi OpenAI:", error.response.data);
+    }
+    res.status(500).json({ error: "Błąd przetwarzania obrazu." });
+  } finally {
+    fs.unlinkSync(req.file.path);
+  }
+});
+
+app.get("/test", (req, res) => {
+  res.send("Serwer działa, OPENAI_API_KEY: " + (process.env.OPENAI_API_KEY ? "OK" : "BRAK"));
+});
+
+app.listen(process.env.PORT || 3000, () => {
+  console.log("Serwer działa");
+});
