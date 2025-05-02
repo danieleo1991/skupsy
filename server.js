@@ -36,12 +36,14 @@ app.post("/app", upload.single("image"), async (req, res) => {
           content: [
             {
               type: "text",
-              text: `Na podstawie zdjęcia oceń, co to za przedmiot i podaj wynik w formacie JSON takim jak poniżej:
+              text: `Jesteś generatorem JSON. Na podstawie zdjęcia określ, co to za przedmiot i podaj wynik w **czystym** formacie JSON (bez żadnego komentarza, opisu, ani dodatkowego tekstu):
+
 {
-  "product_name": "...",
-  "product_my_price": "..."
+  "product_name": "Tutaj wpisz nazwę przedmiotu",
+  "product_my_price": "Tutaj wpisz kwotę np. 250 zł"
 }
-Gdzie "product_name" to nazwa przedmiotu, a "product_my_price" to szacunkowa kwota, za którą lombard może go odkupić. Nic poza JSON-em nie wyświetlaj.`
+
+Zwróć tylko czysty JSON. Nic więcej.`
             },
             {
               type: "image_url",
