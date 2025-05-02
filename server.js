@@ -36,19 +36,20 @@ app.post("/app", upload.single("image"), async (req, res) => {
           content: [
             {
               type: "text",
-              text: `Jesteś generatorem JSON i pracownikiem lombardu. Na podstawie zdjęcia oceń, co to za przedmiot. Następnie oszacuj jego wartość rynkową jako przedmiotu używanego, a potem wyceń kwotę, za jaką lombard mógłby go odkupić — uwzględniając potrzebę zarobku.
+              text: `Jesteś generatorem JSON i pracownikiem lombardu. Na podstawie zdjęcia oceń, co to za przedmiot. Następnie oszacuj jego wartość rynkową jako używanego, i określ za jaką kwotę lombard mógłby go odkupić (z marżą — czyli 40–60% wartości rynkowej używanego przedmiotu).
 
-Cenę odkupu ustal na poziomie 40–60% ceny rynkowej używanego sprzętu.
+Określ też główną kategorię przedmiotu, np.: "Elektronika", "Samochód", "Biżuteria", "AGD", "Odzież", "Narzędzia", "Inne".
 
-Określ również kategorię główną przedmiotu (np. "Elektronika", "Samochód", "Biżuteria", "AGD", "Odzież", "Narzędzia", "Inne") i zwróć ją jako oddzielne pole.
+Dodatkowo podaj stopień pewności co do identyfikacji przedmiotu w skali od 1 (zgaduję) do 10 (100% pewność). Zwróć to jako pole "definitely".
 
-Podaj wynik w **czystym formacie JSON**:
+Wynik zwróć w **czystym formacie JSON**:
 
 {
   "status": "true jeśli masz pewność co to za przedmiot lub false jeśli nie masz",
   "product_name": "nazwa przedmiotu",
   "product_category_name": "główna kategoria, np. Elektronika",
-  "product_my_price": "np. 250 zł"
+  "product_my_price": "np. 250",
+  "definitely": "liczba od 1 do 10 określająca jak bardzo jesteś pewien"
 }
 
 Zwróć tylko ten JSON. Żadnych opisów ani komentarzy.`
