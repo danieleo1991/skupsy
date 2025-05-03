@@ -47,7 +47,7 @@ app.post("/app", upload.single("image"), async (req, res) => {
 				role: "user",
 				content: `Oto pierwsze zdjęcie przedmiotu. Proszę o wycenę.`
 			});
-
+			console.log(quotation.data.product_name);
 			openAI_messages.push({
 				role: "assistant",
 				content: JSON.stringify({
