@@ -29,19 +29,85 @@ app.post("/app", upload.single("image"), async (req, res) => {
 
 	try {
 		
+		const openAI_messages = [];
 		const quotationKey = req.body.quotation_key;
 		const imageData = fs.readFileSync(req.file.path, { encoding: "base64" });
 		const imageHash = crypto.createHash("sha1").update(imageData).digest("hex");
 		const mimeType = req.file.mimetype;
 		const imageBase64 = `data:${mimeType};base64,${imageData}`;
-	
-		console.log(quotationKey);
 		
 		if (quotationKey) {
 			
 			const quotation = await axios.post("https://stepmedia.pl/skupsy/app/get-quotation.php", {
 				secret: "777",
 				quotation_key: quotationKey
+			});
+			
+			openAI_messages.push({
+				role: "user",
+				content: `Oto pierwsze zdjęcie przedmiotu. Proszę o wycenę.`
+			});
+
+			openAI_messages.push({
+				role: "assistant",
+				content: JSON.stringify({
+					status: quotation.status,
+					product_name: quotation.product_name,
+					product_category_name: quotation.product_category_name,
+					definitely: quotation.definitely,
+					condition: quotation.condition,
+					potential: quotation.potential,
+					product_my_price: quotation.product_my_price,
+					need_more_info: quotation.need_more_info,
+					photo_request: quotation.photo_request
+				})
+			});
+
+			openAI_messages.push({
+				role: "user",
+				content: `Oto dodatkowe zdjęcie - zgodnie z wcześniejszą prośbą.`
+			});
+			
+		}
+		else {
+			
+			openAI_messages.push({
+				role: "user",
+				content: [
+					{
+						type: "text",
+						text: `Jesteś generatorem JSON i pracownikiem lombardu. Na podstawie zdjęcia oceń, co to za przedmiot - dokładnie, wraz z modelem lub marką.
+
+						Określ też główną kategorię przedmiotu, np.: "Elektronika", "Samochód", "Biżuteria", "AGD", "Odzież", "Narzędzia", "Inne".
+
+	Dodatkowo podaj stopień pewności co do identyfikacji przedmiotu w skali od 1 (zgaduję) do 10 (100% pewność). Zwróć to jako pole "definitely".
+
+	Jeśli jakość zdjęcia lub jego zawartość nie pozwala jednoznacznie zidentyfikować przedmiotu lub jego stanu, dodaj pole 'photo_request', w którym zasugerujesz użytkownikowi jakie dokładnie zdjęcie powinien dosłać. Np. "Proszę o zdjęcie tabliczki znamionowej z danymi technicznymi", "Proszę o zdjęcie z innej perspektywy, pokazujące stan obudowy", "Proszę o zdjęcie logo producenta i modelu", itp. Jeśli dodatkowe zdjęcie nie jest potrzebne, pomiń to pole.
+
+
+	Wynik zwróć w **czystym formacie JSON**:
+
+	{
+	  "status": "true jeśli masz pewność co to za przedmiot lub false jeśli nie masz",
+	  "product_name": "dokładna nazwa przedmiotu wraz z modelem",
+	  "product_category_name": "główna kategoria, np. Elektronika",
+	  "definitely": "liczba od 1 do 10 włącznie określająca jak bardzo jesteś pewien",
+	  "condition": "liczba od 1 do 10 włącznie określająca obecny stan przedmiotu ze zdjęcia",
+	  "potential": "potencjał sprzedaży przez lombard w skali od 1 do 10 włącznie. Uwzględnij zapotrzebowanie rynkowe na ten produkt, popularność. Lombard musi być zarobić na tym łatwo i szybko. Jeżeli uznasz, że ten przedmiot jest super łatwo sprzedaż z dużym zyskiem to wynik: 10, jeżeli ciężko i mały zysk to potencjał sprzedaży: 1",
+	  "product_my_price": "np. 250. Zaokrąglij wynik w dół do pełnych setek (np. 1125 zł → 1100 zł lub 85 zł → 80 zł). Oszacuj wartość rynkową produktu jako używanego, i określ za jaką kwotę lombard mógłby go odkupić. Weź pod uwagę stan przedmiotu (wartość 'condition') tj. jeśli '10' to 25% wartości rynkowej używanego przedmiotu, jeśli '1' to 10% wartości rynkowej używanego przedmiotu i reszta analogicznie. Weź także pod uwagę parametr 'potential' - im wyższy tym wyższa wartość produktu, a im niższy niż tym niższa wartość produktu",
+	  "need_more_info": "wpisz '1' jeśli do wyceny potrzebujesz więcej informacji (np. ilość RAM itp.) lub wpisz '0' jeśli nie potrzebujesz dodatkowych informacji, aby wycenić dokładnie produkt",
+	  "photo_request": "jeśli potrzebne jest dodatkowe zdjęcie - wpisz instrukcję jakie, np. 'Proszę o zdjęcie tabliczki znamionowej'. Jeśli niepotrzebne – pomiń to pole."
+	}
+
+	Zwróć tylko ten JSON. Żadnych opisów ani komentarzy.`
+				},
+				{
+				  type: "image_url",
+				  image_url: {
+					url: `data:${mimeType};base64,${imageData}`
+				  }
+				}
+			  ]
 			});
 			
 		}
@@ -62,47 +128,8 @@ app.post("/app", upload.single("image"), async (req, res) => {
     const response = await openai.chat.completions.create({
 		model: "gpt-4.1-mini",
 		temperature: 0,
-		messages: [
-		{
-			role: "user",
-			content: [
-            {
-              type: "text",
-              text: `Jesteś generatorem JSON i pracownikiem lombardu. Na podstawie zdjęcia oceń, co to za przedmiot - dokładnie, wraz z modelem lub marką.
-
-Określ też główną kategorię przedmiotu, np.: "Elektronika", "Samochód", "Biżuteria", "AGD", "Odzież", "Narzędzia", "Inne".
-
-Dodatkowo podaj stopień pewności co do identyfikacji przedmiotu w skali od 1 (zgaduję) do 10 (100% pewność). Zwróć to jako pole "definitely".
-
-Jeśli jakość zdjęcia lub jego zawartość nie pozwala jednoznacznie zidentyfikować przedmiotu lub jego stanu, dodaj pole 'photo_request', w którym zasugerujesz użytkownikowi jakie dokładnie zdjęcie powinien dosłać. Np. "Proszę o zdjęcie tabliczki znamionowej z danymi technicznymi", "Proszę o zdjęcie z innej perspektywy, pokazujące stan obudowy", "Proszę o zdjęcie logo producenta i modelu", itp. Jeśli dodatkowe zdjęcie nie jest potrzebne, pomiń to pole.
-
-
-Wynik zwróć w **czystym formacie JSON**:
-
-{
-  "status": "true jeśli masz pewność co to za przedmiot lub false jeśli nie masz",
-  "product_name": "dokładna nazwa przedmiotu wraz z modelem",
-  "product_category_name": "główna kategoria, np. Elektronika",
-  "definitely": "liczba od 1 do 10 włącznie określająca jak bardzo jesteś pewien",
-  "condition": "liczba od 1 do 10 włącznie określająca obecny stan przedmiotu ze zdjęcia",
-  "potential": "potencjał sprzedaży przez lombard w skali od 1 do 10 włącznie. Uwzględnij zapotrzebowanie rynkowe na ten produkt, popularność. Lombard musi być zarobić na tym łatwo i szybko. Jeżeli uznasz, że ten przedmiot jest super łatwo sprzedaż z dużym zyskiem to wynik: 10, jeżeli ciężko i mały zysk to potencjał sprzedaży: 1",
-  "product_my_price": "np. 250. Zaokrąglij wynik w dół do pełnych setek (np. 1125 zł → 1100 zł lub 85 zł → 80 zł). Oszacuj wartość rynkową produktu jako używanego, i określ za jaką kwotę lombard mógłby go odkupić. Weź pod uwagę stan przedmiotu (wartość 'condition') tj. jeśli '10' to 25% wartości rynkowej używanego przedmiotu, jeśli '1' to 10% wartości rynkowej używanego przedmiotu i reszta analogicznie. Weź także pod uwagę parametr 'potential' - im wyższy tym wyższa wartość produktu, a im niższy niż tym niższa wartość produktu",
-  "need_more_info": "wpisz '1' jeśli do wyceny potrzebujesz więcej informacji (np. ilość RAM itp.) lub wpisz '0' jeśli nie potrzebujesz dodatkowych informacji, aby wycenić dokładnie produkt",
-  "photo_request": "jeśli potrzebne jest dodatkowe zdjęcie - wpisz instrukcję jakie, np. 'Proszę o zdjęcie tabliczki znamionowej'. Jeśli niepotrzebne – pomiń to pole."
-}
-
-Zwróć tylko ten JSON. Żadnych opisów ani komentarzy.`
-            },
-            {
-              type: "image_url",
-              image_url: {
-                url: `data:${mimeType};base64,${imageData}`
-              }
-            }
-          ]
-        }
-      ],
-      max_tokens: 1000,
+		messages: openAI_messages,
+		max_tokens: 1000,
     });
 
     const content = response.choices[0].message.content;
