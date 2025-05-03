@@ -66,10 +66,10 @@ Wynik zwróć w **czystym formacie JSON**:
   "status": "true jeśli masz pewność co to za przedmiot lub false jeśli nie masz",
   "product_name": "dokładna nazwa przedmiotu wraz z modelem",
   "product_category_name": "główna kategoria, np. Elektronika",
-  "product_my_price": "np. 250. Zaokrąglij wynik w dół do pełnych setek (np. 1125 zł → 1100 zł lub 85 zł → 80 zł). Oszacuj wartość rynkową produktu jako używanego, i określ za jaką kwotę lombard mógłby go odkupić. Weź pod uwagę stan przedmiotu (wartość 'definitely') tj. jeśli '10' to 25% wartości rynkowej używanego przedmiotu, jeśli '1' to 10% wartości rynkowej używanego przedmiotu i reszta analogicznie)",
   "definitely": "liczba od 1 do 10 włącznie określająca jak bardzo jesteś pewien",
   "condition": "liczba od 1 do 10 włącznie określająca obecny stan przedmiotu ze zdjęcia",
   "potential": "potencjał sprzedaży przez lombard w skali od 1 do 10 włącznie. Uwzględnij zapotrzebowanie rynkowe na ten produkt, popularność. Lombard musi być zarobić na tym łatwo i szybko. Jeżeli uznasz, że ten przedmiot jest super łatwo sprzedaż z dużym zyskiem to wynik: 10, jeżeli ciężko i mały zysk to potencjał sprzedaży: 1",
+  "product_my_price": "np. 250. Zaokrąglij wynik w dół do pełnych setek (np. 1125 zł → 1100 zł lub 85 zł → 80 zł). Oszacuj wartość rynkową produktu jako używanego, i określ za jaką kwotę lombard mógłby go odkupić. Weź pod uwagę stan przedmiotu (wartość 'condition') tj. jeśli '10' to 25% wartości rynkowej używanego przedmiotu, jeśli '1' to 10% wartości rynkowej używanego przedmiotu i reszta analogicznie. Weź także pod uwagę parametr 'potential' - im wyższy tym wyższa wartość produktu, a im niższy niż tym niższa wartość produktu",
   "need_more_info": "wpisz '1' jeśli do wyceny potrzebujesz więcej informacji (np. ilość RAM itp.) lub wpisz '0' jeśli nie potrzebujesz dodatkowych informacji, aby wycenić dokładnie produkt"
 }
 
