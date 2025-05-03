@@ -26,6 +26,7 @@ const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 app.post("/app", upload.single("image"), async (req, res) => {
 	
 	if (!req.file) return res.status(400).json({ error: "Brak zdjęcia." });
+	console.log("JEST OBRAZEK");
 
 	try {
 		
@@ -36,8 +37,14 @@ app.post("/app", upload.single("image"), async (req, res) => {
 		const imageBase64 = `data:${mimeType};base64,${imageData}`;
 	
 		if (quotationKey) {
-			console.log("📦 Kontynuacja wyceny, quotation_key:", quotationKey);
-		} else {
+			
+			const quotation = await axios.post("https://stepmedia.pl/skupsy/app/get-quotation.php", {
+				secret: "777",
+				quotation_key: quotationKey
+			});
+			
+		}
+		else {
 			console.log("🆕 Nowa wycena (brak quotation_key)");
 		}
 
