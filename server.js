@@ -9,16 +9,15 @@ const { OpenAI } = require("openai");
 
 const app = express();
 
-// CORS dla frontendu
 app.use(cors({
-  origin: 'https://stepmedia.pl',
-  methods: ['GET', 'POST'],
-  credentials: false
+	origin: 'https://stepmedia.pl',
+	methods: ['GET', 'POST'],
+	credentials: false
 }));
 
 const upload = multer({
-  dest: "uploads/",
-  limits: { fileSize: 8 * 1024 * 1024 }, // 8 MB
+	dest: "uploads/",
+	limits: { fileSize: 8 * 1024 * 1024 },
 });
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
@@ -140,10 +139,10 @@ app.post("/app", upload.single("image"), async (req, res) => {
 	Zwróć tylko ten JSON. Żadnych opisów ani komentarzy.`
 				},
 				{
-				  type: "image_url",
-				  image_url: {
-					url: `data:${mimeType};base64,${imageData}`
-				  }
+					type: "image_url",
+					image_url: {
+						url: `data:${mimeType};base64,${imageData}`
+					}
 				}
 			  ]
 			});
@@ -166,7 +165,7 @@ app.post("/app", upload.single("image"), async (req, res) => {
 		console.log("GPT...");
 
 		const response = await openai.chat.completions.create({
-			model: "gpt-4.1-mini",
+			model: "gpt-4-vision-preview",
 			temperature: 0,
 			messages: openAI_messages,
 			max_tokens: 1000,
