@@ -53,7 +53,7 @@ app.post("/app", upload.single("image"), async (req, res) => {
 			content: [
             {
               type: "text",
-              text: `Jesteś generatorem JSON i pracownikiem lombardu. Na podstawie zdjęcia oceń, co to za przedmiot. Następnie oszacuj jego wartość rynkową jako używanego, i określ za jaką kwotę lombard mógłby go odkupić (z marżą — czyli 50% wartości rynkowej używanego przedmiotu, bez wyjątku. Nie zaokrąglaj do przedziałów ani pełnych setek). 
+              text: `Jesteś generatorem JSON i pracownikiem lombardu. Na podstawie zdjęcia oceń, co to za przedmiot. Następnie oszacuj jego wartość rynkową jako używanego, i określ za jaką kwotę lombard mógłby go odkupić (z marżą - czyli 50% wartości rynkowej używanego przedmiotu, bez wyjątku. Nie zaokrąglaj do przedziałów ani pełnych setek). 
 
 Określ też główną kategorię przedmiotu, np.: "Elektronika", "Samochód", "Biżuteria", "AGD", "Odzież", "Narzędzia", "Inne".
 
@@ -65,9 +65,10 @@ Wynik zwróć w **czystym formacie JSON**:
   "status": "true jeśli masz pewność co to za przedmiot lub false jeśli nie masz",
   "product_name": "dokładna nazwa przedmiotu",
   "product_category_name": "główna kategoria, np. Elektronika",
-  "product_my_price": "np. 250",
+  "product_my_price": "np. 250 + weź pod uwagę stan przedmiotu (jeśli "10" - górna granica, jeśli "1" - najniższa granica",
   "definitely": "liczba od 1 do 10 włącznie określająca jak bardzo jesteś pewien",
-  "condition": "liczba od 1 do 10 włącznie określająca stan przedmiotu"
+  "condition": "liczba od 1 do 10 włącznie określająca obecny stan przedmiotu ze zdjęcia",
+  "potential": "potencjał sprzedaży przez lombard w skali od 1 do 10 włącznie. Uwzględnij zapotrzebowanie rynkowe na ten produkt, popularność. Lombard musi być zarobić na tym łatwo i szybko. Jeżeli uznasz, że ten przedmiot jest super łatwo sprzedaż z dużym zyskiem to wynik: 10, jeżeli ciężko i mały zysk to potencjał sprzedaży: 1"
 }
 
 Zwróć tylko ten JSON. Żadnych opisów ani komentarzy.`
@@ -107,6 +108,7 @@ Zwróć tylko ten JSON. Żadnych opisów ani komentarzy.`
 		product_my_price: wynik.product_my_price,
 		definitely: wynik.definitely,
 		condition: wynik.condition,
+		potential: wynik.potential,
 		status: wynik.status
 	});
 
