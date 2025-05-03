@@ -133,6 +133,7 @@ app.post("/app", upload.single("image"), async (req, res) => {
     });
 
     const content = response.choices[0].message.content;
+	console.log("📥 Treść od GPT:", content);
     let wynik;
 
     try {
