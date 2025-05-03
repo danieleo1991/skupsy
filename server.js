@@ -35,8 +35,7 @@ app.post("/app", upload.single("image"), async (req, res) => {
 	try {
 		const check = await axios.post("https://stepmedia.pl/skupsy/app/check-hash-image.php", {
 			secret: "777",
-			image_hash: imageHash,
-			image_base64: imageBase64
+			image_hash: imageHash
 		});
 		if (check.data.status === "found") {
 			return res.send(check.data);
@@ -105,6 +104,7 @@ Zwróć tylko ten JSON. Żadnych opisów ani komentarzy.`
 	const quotationResponse = await axios.post("https://stepmedia.pl/skupsy/app/quotation.php", {
 		secret: "777",
 		image_hash: imageHash,
+		image_base64: imageBase64,
 		product_name: wynik.product_name,
 		product_category_name: wynik.product_category_name,
 		product_my_price: wynik.product_my_price,
