@@ -162,6 +162,8 @@ app.post("/app", upload.single("image"), async (req, res) => {
 			}
 			
 		}
+		
+		console.log("GPT...");
 
 		const response = await openai.chat.completions.create({
 			model: "gpt-4.1-mini",
@@ -174,46 +176,49 @@ app.post("/app", upload.single("image"), async (req, res) => {
 		console.log("📥 Treść od GPT:", content);
 		let wynik;
 
-    try {
-      const match = content.match(/{[\s\S]*}/);
-	  if (match) {
-		wynik = JSON.parse(match[0]);
-	  } else {
-		throw new Error("Nie znaleziono żadnego JSON-a w treści");
-	  }
-    } catch (e) {
-      console.error("❗ Błąd parsowania JSON:", e.message);
-      wynik = { error: "Nie udało się sparsować odpowiedzi GPT jako JSON." };
-    }
+		try {
+			const match = content.match(/{[\s\S]*}/);
+			if (match) {
+				wynik = JSON.parse(match[0]);
+			}
+			else {
+				throw new Error("Nie znaleziono żadnego JSON-a w treści");
+			}
+		}
+		catch (e) {
+			console.error("❗ Błąd parsowania JSON:", e.message);
+			wynik = { error: "Nie udało się sparsować odpowiedzi GPT jako JSON." };
+		}
 	
-	const quotationResponse = await axios.post("https://stepmedia.pl/skupsy/app/quotation.php", {
-		secret: "777",
-		image_hash: imageHash,
-		image_base64: imageBase64,
-		product_name: wynik.product_name,
-		product_category_name: wynik.product_category_name,
-		product_my_price: wynik.product_my_price,
-		definitely: wynik.definitely,
-		condition: wynik.condition,
-		potential: wynik.potential,
-		status: wynik.status,
-		need_more_info: wynik.need_more_info,
-		photo_request: wynik.photo_request
-	});
+		const quotationResponse = await axios.post("https://stepmedia.pl/skupsy/app/quotation.php", {
+			secret: "777",
+			image_hash: imageHash,
+			image_base64: imageBase64,
+			product_name: wynik.product_name,
+			product_category_name: wynik.product_category_name,
+			product_my_price: wynik.product_my_price,
+			definitely: wynik.definitely,
+			condition: wynik.condition,
+			potential: wynik.potential,
+			status: wynik.status,
+			need_more_info: wynik.need_more_info,
+			photo_request: wynik.photo_request
+		});
 
-    res.send(quotationResponse.data);
+		res.send(quotationResponse.data);
 
-  } catch (error) {
-    console.error("❌ Błąd serwera:", error?.message || error);
-    if (error?.response?.data) {
-      console.error("📦 Szczegóły odpowiedzi OpenAI:", error.response.data);
-    }
-    res.status(500).json({ error: "Błąd przetwarzania obrazu." });
-  } finally {
-    fs.unlinkSync(req.file.path);
-  }
+	}
+	catch (error) {
+		console.error("❌ Błąd serwera:", error?.message || error);
+		if (error?.response?.data) {
+			console.error("📦 Szczegóły odpowiedzi OpenAI:", error.response.data);
+		}
+		res.status(500).json({ error: "Błąd przetwarzania obrazu." });
+	}
+	finally {
+		fs.unlinkSync(req.file.path);
+	}
+	
 });
 
-app.listen(process.env.PORT || 3000, () => {
-  console.log("Serwer działa");
-});
+app.listen(process.env.PORT || 3000);
