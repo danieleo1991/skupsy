@@ -43,6 +43,34 @@ app.post("/app", upload.single("image"), async (req, res) => {
 				quotation_key: quotationKey
 			});
 			
+			openAI_messages.unshift({
+				role: "system",
+				content: `
+					Jesteś generatorem JSON i pracownikiem lombardu. 
+					Na podstawie zdjęcia oceń, co to za przedmiot – dokładnie, wraz z marką i modelem.
+					Zwróć wynik **zawsze w formacie JSON** według poniższego schematu (nie dodawaj żadnych opisów, komentarzy, ani tekstów poza JSON-em):
+
+					{
+						"status": "...",
+						"product_name": "...",
+						"product_category_name": "...",
+						"definitely": "...",
+						"condition": "...",
+						"potential": "...",
+						"product_my_price": "...",
+						"need_more_info": "...",
+						"photo_request": "..."
+					}
+
+					Uwzględnij:
+					- jeśli condition = 10 → cena = 25% wartości rynkowej
+					- jeśli condition = 1 → cena = 10% wartości rynkowej
+					- zaokrąglij w dół do pełnych setek (np. 1125 zł → 1100 zł)
+					- im wyższy potential, tym wyższa cena
+					- nigdy nie odpowiadaj tekstem poza JSON
+				`
+			});
+			
 			openAI_messages.push({
 				role: "assistant",
 				content: JSON.stringify({
@@ -62,18 +90,18 @@ app.post("/app", upload.single("image"), async (req, res) => {
 				role: "user",
 				content: [
 				{
-				type: "text",
-				text: `Oto dodatkowe zdjęcie tego samego przedmiotu. Proszę o pełną wycenę na podstawie **obiektu widocznego na tym zdjęciu**.
+					type: "text",
+					text: `Oto dodatkowe zdjęcie tego samego przedmiotu. Proszę o pełną wycenę na podstawie **obiektu widocznego na tym zdjęciu**.
 
-				Nie zadawaj więcej pytań. Nie proś o dodatkowe dane. Nie podawaj komentarzy.
+					Nie zadawaj więcej pytań. Nie proś o dodatkowe dane. Nie podawaj komentarzy.
 
-				Zwróć tylko wynik w czystym formacie JSON jak wcześniej.`
+					Zwróć tylko wynik w czystym formacie JSON jak wcześniej.`
 				},
 				{
-				type: "image_url",
-				image_url: {
-				url: `data:${mimeType};base64,${imageData}`
-				}
+					type: "image_url",
+					image_url: {
+						url: `data:${mimeType};base64,${imageData}`
+					}
 				}
 				]
 			});
