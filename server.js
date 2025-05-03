@@ -91,11 +91,12 @@ app.post("/app", upload.single("image"), async (req, res) => {
 				content: [
 				{
 					type: "text",
-					text: `Oto dodatkowe zdjęcie. Oceń **wyłącznie to zdjęcie**, niezależnie od wcześniejszych danych.
+					text: `Oto dodatkowe zdjęcie tego samego przedmiotu. Proszę o pełną wycenę na podstawie **obiektu widocznego na tym zdjęciu**.
 
-Jeśli nie jesteś w stanie ocenić przedmiotu z tego zdjęcia – **zwróć photo_request i status: false**.
+					Jeśli masz wystarczająco danych - podaj kompletną wycenę.
+					Jeśli nie potrzeba dodatkowego zdjęcia - nie zwracaj w ogóle pola photo_request
 
-Zwróć wynik tylko w czystym formacie JSON jak wcześniej.`
+					Zwróć tylko wynik w czystym formacie JSON jak wcześniej.`
 				},
 				{
 					type: "image_url",
