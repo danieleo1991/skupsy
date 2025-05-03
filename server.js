@@ -117,7 +117,8 @@ Zwróć tylko ten JSON. Żadnych opisów ani komentarzy.`
 		condition: wynik.condition,
 		potential: wynik.potential,
 		status: wynik.status,
-		need_more_info: wynik.need_more_info
+		need_more_info: wynik.need_more_info,
+		photo_request: wynik.photo_request
 	});
 
     res.send(quotationResponse.data);
