@@ -53,7 +53,7 @@ app.post("/app", upload.single("image"), async (req, res) => {
 			content: [
             {
               type: "text",
-              text: `Jesteś generatorem JSON i pracownikiem lombardu. Na podstawie zdjęcia oceń, co to za przedmiot. Następnie oszacuj jego wartość rynkową jako używanego, i określ za jaką kwotę lombard mógłby go odkupić (z marżą - czyli 35% wartości rynkowej używanego przedmiotu, bez wyjątku. Nie zaokrąglaj do przedziałów ani pełnych setek). 
+              text: `Jesteś generatorem JSON i pracownikiem lombardu. Na podstawie zdjęcia oceń, co to za przedmiot - dokładnie, wraz z modelem lub marką. Następnie oszacuj jego wartość rynkową jako używanego, i określ za jaką kwotę lombard mógłby go odkupić (z marżą - czyli 35% wartości rynkowej używanego przedmiotu, bez wyjątku. Nie zaokrąglaj do przedziałów ani pełnych setek). 
 
 Określ też główną kategorię przedmiotu, np.: "Elektronika", "Samochód", "Biżuteria", "AGD", "Odzież", "Narzędzia", "Inne".
 
@@ -63,7 +63,7 @@ Wynik zwróć w **czystym formacie JSON**:
 
 {
   "status": "true jeśli masz pewność co to za przedmiot lub false jeśli nie masz",
-  "product_name": "dokładna nazwa przedmiotu",
+  "product_name": "dokładna nazwa przedmiotu wraz z modelem",
   "product_category_name": "główna kategoria, np. Elektronika",
   "product_my_price": "np. 250 + weź pod uwagę stan przedmiotu (jeśli "10" - górna granica, jeśli "1" - najniższa granica + kwotę zaokrąglij kwotę w dół",
   "definitely": "liczba od 1 do 10 włącznie określająca jak bardzo jesteś pewien",
