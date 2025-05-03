@@ -24,26 +24,35 @@ const upload = multer({
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 app.post("/app", upload.single("image"), async (req, res) => {
-  if (!req.file) return res.status(400).json({ error: "Brak zdjęcia." });
-
-  try {
-    const imageData = fs.readFileSync(req.file.path, { encoding: "base64" });
-	const imageHash = crypto.createHash("sha1").update(imageData).digest("hex");
-    const mimeType = req.file.mimetype;
-	const imageBase64 = `data:${mimeType};base64,${imageData}`;
 	
+	if (!req.file) return res.status(400).json({ error: "Brak zdjęcia." });
+
 	try {
-		const check = await axios.post("https://stepmedia.pl/skupsy/app/check-hash-image.php", {
-			secret: "777",
-			image_hash: imageHash
-		});
-		if (check.data.status === "found") {
-			return res.send(check.data);
+		
+		const quotationKey = req.body.quotation_key;
+		const imageData = fs.readFileSync(req.file.path, { encoding: "base64" });
+		const imageHash = crypto.createHash("sha1").update(imageData).digest("hex");
+		const mimeType = req.file.mimetype;
+		const imageBase64 = `data:${mimeType};base64,${imageData}`;
+	
+		if (quotationKey) {
+			console.log("📦 Kontynuacja wyceny, quotation_key:", quotationKey);
+		} else {
+			console.log("🆕 Nowa wycena (brak quotation_key)");
 		}
-	}
-	catch (err) {
-		console.error("❌ Błąd sprawdzania hasha:", err.message);
-    }
+
+		try {
+			const check = await axios.post("https://stepmedia.pl/skupsy/app/check-hash-image.php", {
+				secret: "777",
+				image_hash: imageHash
+			});
+			if (check.data.status === "found") {
+				return res.send(check.data);
+			}
+		}
+		catch (err) {
+			console.error("❌ Błąd sprawdzania hasha:", err.message);
+		}
 
     const response = await openai.chat.completions.create({
 		model: "gpt-4.1-mini",
