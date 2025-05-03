@@ -37,7 +37,7 @@ app.post("/app", upload.single("image"), async (req, res) => {
 			image_hash: imageHash
 		});
 		if (check.data.status === "found") {
-			return res.send({ wynik: check.data.wynik });
+			return res.send({ wynik: check.data });
 		}
 	}
 	catch (err) {
@@ -65,7 +65,7 @@ Wynik zwróć w **czystym formacie JSON**:
   "status": "true jeśli masz pewność co to za przedmiot lub false jeśli nie masz",
   "product_name": "dokładna nazwa przedmiotu",
   "product_category_name": "główna kategoria, np. Elektronika",
-  "product_my_price": "np. 250 + weź pod uwagę stan przedmiotu (jeśli "10" - górna granica, jeśli "1" - najniższa granica",
+  "product_my_price": "np. 250 + weź pod uwagę stan przedmiotu (jeśli "10" - górna granica, jeśli "1" - najniższa granica + kwotę zaokrąglij kwotę w dół",
   "definitely": "liczba od 1 do 10 włącznie określająca jak bardzo jesteś pewien",
   "condition": "liczba od 1 do 10 włącznie określająca obecny stan przedmiotu ze zdjęcia",
   "potential": "potencjał sprzedaży przez lombard w skali od 1 do 10 włącznie. Uwzględnij zapotrzebowanie rynkowe na ten produkt, popularność. Lombard musi być zarobić na tym łatwo i szybko. Jeżeli uznasz, że ten przedmiot jest super łatwo sprzedaż z dużym zyskiem to wynik: 10, jeżeli ciężko i mały zysk to potencjał sprzedaży: 1"
@@ -123,10 +123,6 @@ Zwróć tylko ten JSON. Żadnych opisów ani komentarzy.`
   } finally {
     fs.unlinkSync(req.file.path);
   }
-});
-
-app.get("/test", (req, res) => {
-  res.send("Serwer działa, OPENAI_API_KEY: " + (process.env.OPENAI_API_KEY ? "OK" : "BRAK"));
 });
 
 app.listen(process.env.PORT || 3000, () => {
