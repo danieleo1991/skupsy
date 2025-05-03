@@ -95,7 +95,7 @@ app.post("/app", upload.single("image"), async (req, res) => {
 
 Jeśli nie jesteś w stanie ocenić przedmiotu z tego zdjęcia – **zwróć photo_request i status: false**.
 
-Zwróć wynik tylko w czystym formacie JSON jak wcześniej.
+Zwróć wynik tylko w czystym formacie JSON jak wcześniej.`
 				},
 				{
 					type: "image_url",
