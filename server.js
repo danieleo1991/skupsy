@@ -24,10 +24,8 @@ const upload = multer({
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 app.post("/app", upload.single("image"), async (req, res) => {
-	console.log(req);
 	
 	if (!req.file) return res.status(400).json({ error: "Brak zdjęcia." });
-	console.log("JEST OBRAZEK");
 
 	try {
 		
@@ -37,6 +35,8 @@ app.post("/app", upload.single("image"), async (req, res) => {
 		const mimeType = req.file.mimetype;
 		const imageBase64 = `data:${mimeType};base64,${imageData}`;
 	
+		console.log(quotationKey);
+		
 		if (quotationKey) {
 			
 			const quotation = await axios.post("https://stepmedia.pl/skupsy/app/get-quotation.php", {
