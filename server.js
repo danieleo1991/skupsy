@@ -43,7 +43,7 @@ app.post("/app", upload.single("image"), async (req, res) => {
 	catch (err) {
 		console.error("❌ Błąd sprawdzania hasha:", err.message);
     }
-	  
+
     const response = await openai.chat.completions.create({
 		model: "gpt-4.1-mini",
 		temperature: 0,
@@ -99,6 +99,8 @@ Zwróć tylko ten JSON. Żadnych opisów ani komentarzy.`
       console.error("❗ Błąd parsowania JSON:", e.message);
       wynik = { error: "Nie udało się sparsować odpowiedzi GPT jako JSON." };
     }
+	
+	console.log(wynik);
 	
 	await axios.post("https://stepmedia.pl/skupsy/app/quotation.php", {
 		secret: "777",
