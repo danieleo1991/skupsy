@@ -53,7 +53,7 @@ app.post("/app", upload.single("image"), async (req, res) => {
 			content: [
             {
               type: "text",
-              text: `Jesteś generatorem JSON i pracownikiem lombardu. Na podstawie zdjęcia oceń, co to za przedmiot. Następnie oszacuj jego wartość rynkową jako używanego, i określ za jaką kwotę lombard mógłby go odkupić (z marżą - czyli 50% wartości rynkowej używanego przedmiotu, bez wyjątku. Nie zaokrąglaj do przedziałów ani pełnych setek). 
+              text: `Jesteś generatorem JSON i pracownikiem lombardu. Na podstawie zdjęcia oceń, co to za przedmiot. Następnie oszacuj jego wartość rynkową jako używanego, i określ za jaką kwotę lombard mógłby go odkupić (z marżą - czyli 40% wartości rynkowej używanego przedmiotu, bez wyjątku. Nie zaokrąglaj do przedziałów ani pełnych setek). 
 
 Określ też główną kategorię przedmiotu, np.: "Elektronika", "Samochód", "Biżuteria", "AGD", "Odzież", "Narzędzia", "Inne".
 
@@ -99,8 +99,6 @@ Zwróć tylko ten JSON. Żadnych opisów ani komentarzy.`
       console.error("❗ Błąd parsowania JSON:", e.message);
       wynik = { error: "Nie udało się sparsować odpowiedzi GPT jako JSON." };
     }
-	
-	console.log(wynik);
 	
 	await axios.post("https://stepmedia.pl/skupsy/app/quotation.php", {
 		secret: "777",
