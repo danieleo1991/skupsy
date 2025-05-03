@@ -148,31 +148,31 @@ app.post("/app", upload.single("image"), async (req, res) => {
 			  ]
 			});
 			
-		}
-
-		try {
-			const check = await axios.post("https://stepmedia.pl/skupsy/app/check-hash-image.php", {
-				secret: "777",
-				image_hash: imageHash
-			});
-			if (check.data.status === "found") {
-				return res.send(check.data);
+			try {
+				const check = await axios.post("https://stepmedia.pl/skupsy/app/check-hash-image.php", {
+					secret: "777",
+					image_hash: imageHash
+				});
+				if (check.data.status === "found") {
+					return res.send(check.data);
+				}
 			}
-		}
-		catch (err) {
-			console.error("❌ Błąd sprawdzania hasha:", err.message);
+			catch (err) {
+				console.error("❌ Błąd sprawdzania hasha:", err.message);
+			}
+			
 		}
 
-    const response = await openai.chat.completions.create({
-		model: "gpt-4.1-mini",
-		temperature: 0,
-		messages: openAI_messages,
-		max_tokens: 1000,
-    });
+		const response = await openai.chat.completions.create({
+			model: "gpt-4.1-mini",
+			temperature: 0,
+			messages: openAI_messages,
+			max_tokens: 1000,
+		});
 
-    const content = response.choices[0].message.content;
-	console.log("📥 Treść od GPT:", content);
-    let wynik;
+		const content = response.choices[0].message.content;
+		console.log("📥 Treść od GPT:", content);
+		let wynik;
 
     try {
       const match = content.match(/{[\s\S]*}/);
