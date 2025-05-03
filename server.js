@@ -37,7 +37,7 @@ app.post("/app", upload.single("image"), async (req, res) => {
 			image_hash: imageHash
 		});
 		if (check.data.status === "found") {
-			return res.send({ wynik: check.data });
+			return res.send(check.data);
 		}
 	}
 	catch (err) {
