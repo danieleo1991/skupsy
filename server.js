@@ -94,7 +94,8 @@ app.post("/app", upload.single("image"), async (req, res) => {
 					text: `Oto dodatkowe zdjęcie tego samego przedmiotu. Proszę o pełną wycenę na podstawie **obiektu widocznego na tym zdjęciu**.
 
 					Jeśli masz wystarczająco danych - podaj kompletną wycenę.
-					Jeśli nie potrzeba dodatkowego zdjęcia - nie zwracaj w ogóle pola photo_request
+					Jeśli dalej nie wiesz co to dokładnie za przedmiot, poproś 
+					Jeśli jakość zdjęcia lub jego zawartość nie pozwala jednoznacznie zidentyfikować przedmiotu lub jego stanu, dodaj pole 'photo_request', w którym zasugerujesz użytkownikowi jakie dokładnie zdjęcie powinien dosłać. Np. "Proszę o zdjęcie tabliczki znamionowej z danymi technicznymi", "Proszę o zdjęcie z innej perspektywy, pokazujące stan obudowy", "Proszę o zdjęcie logo producenta i modelu", itp. Jeśli dodatkowe zdjęcie nie jest potrzebne, pomiń to pole.
 
 					Zwróć tylko wynik w czystym formacie JSON jak wcześniej.`
 				},
