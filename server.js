@@ -92,7 +92,7 @@ app.post("/app", upload.single("image"), async (req, res) => {
 					type: "text",
 					text: `Oto dodatkowe zdjęcie tego samego przedmiotu. Proszę o pełną wycenę na podstawie **obiektu widocznego na tym zdjęciu**.
 
-					Nie zadawaj więcej pytań. Nie proś o dodatkowe dane. Nie podawaj komentarzy.
+					Jeśli masz wystarczająco danych — podaj kompletną wycenę.
 
 					Zwróć tylko wynik w czystym formacie JSON jak wcześniej.`
 				},
