@@ -51,15 +51,15 @@ app.post("/app", upload.single("image"), async (req, res) => {
 			openAI_messages.push({
 				role: "assistant",
 				content: JSON.stringify({
-					status: quotation.status,
-					product_name: quotation.product_name,
-					product_category_name: quotation.product_category_name,
-					definitely: quotation.definitely,
-					condition: quotation.condition,
-					potential: quotation.potential,
-					product_my_price: quotation.product_my_price,
-					need_more_info: quotation.need_more_info,
-					photo_request: quotation.photo_request
+					status: quotation.data.status,
+					product_name: quotation.data.product_name,
+					product_category_name: quotation.data.product_category_name,
+					definitely: quotation.data.definitely,
+					condition: quotation.data.condition,
+					potential: quotation.data.potential,
+					product_my_price: quotation.data.product_my_price,
+					need_more_info: quotation.data.need_more_info,
+					photo_request: quotation.data.photo_request
 				})
 			});
 
