@@ -44,7 +44,6 @@ app.post("/app", upload.single("image"), async (req, res) => {
 		console.error("❌ Błąd sprawdzania hasha:", err.message);
     }
 	  
-
     const response = await openai.chat.completions.create({
 		model: "gpt-4.1-mini",
 		temperature: 0,
