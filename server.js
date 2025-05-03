@@ -44,11 +44,6 @@ app.post("/app", upload.single("image"), async (req, res) => {
 			});
 			
 			openAI_messages.push({
-				role: "user",
-				content: `Oto pierwsze zdjęcie przedmiotu. Proszę o wycenę.`
-			});
-			console.log(quotation.data.product_name);
-			openAI_messages.push({
 				role: "assistant",
 				content: JSON.stringify({
 					status: quotation.data.status,
@@ -65,7 +60,22 @@ app.post("/app", upload.single("image"), async (req, res) => {
 
 			openAI_messages.push({
 				role: "user",
-				content: `Oto dodatkowe zdjęcie - zgodnie z wcześniejszą prośbą.`
+				content: [
+				{
+				type: "text",
+				text: `Oto dodatkowe zdjęcie tego samego przedmiotu. Proszę o pełną wycenę na podstawie **obiektu widocznego na tym zdjęciu**.
+
+				Nie zadawaj więcej pytań. Nie proś o dodatkowe dane. Nie podawaj komentarzy.
+
+				Zwróć tylko wynik w czystym formacie JSON jak wcześniej.`
+				},
+				{
+				type: "image_url",
+				image_url: {
+				url: `data:${mimeType};base64,${imageData}`
+				}
+				}
+				]
 			});
 			
 		}
