@@ -165,7 +165,7 @@ app.post("/app", upload.single("image"), async (req, res) => {
 		console.log("GPT...");
 
 		const response = await openai.chat.completions.create({
-			model: "gpt-4-vision-preview",
+			model: "gpt-4.1-mini",
 			temperature: 0,
 			messages: openAI_messages,
 			max_tokens: 1000,
@@ -191,6 +191,7 @@ app.post("/app", upload.single("image"), async (req, res) => {
 	
 		const quotationResponse = await axios.post("https://stepmedia.pl/skupsy/app/quotation.php", {
 			secret: "777",
+			quotation_key: quotationKey,
 			image_hash: imageHash,
 			image_base64: imageBase64,
 			product_name: wynik.product_name,
