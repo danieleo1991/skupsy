@@ -69,7 +69,8 @@ Wynik zwróć w **czystym formacie JSON**:
   "product_my_price": "product_my_price": "np. 250 + weź pod uwagę stan przedmiotu (jeśli '10' - górna granica, jeśli '1' - najniższa granica). Zaokrąglij wynik w dół do pełnych setek (np. 1125 zł → 1100 zł lub 85 zł → 80 zł).",
   "definitely": "liczba od 1 do 10 włącznie określająca jak bardzo jesteś pewien",
   "condition": "liczba od 1 do 10 włącznie określająca obecny stan przedmiotu ze zdjęcia",
-  "potential": "potencjał sprzedaży przez lombard w skali od 1 do 10 włącznie. Uwzględnij zapotrzebowanie rynkowe na ten produkt, popularność. Lombard musi być zarobić na tym łatwo i szybko. Jeżeli uznasz, że ten przedmiot jest super łatwo sprzedaż z dużym zyskiem to wynik: 10, jeżeli ciężko i mały zysk to potencjał sprzedaży: 1"
+  "potential": "potencjał sprzedaży przez lombard w skali od 1 do 10 włącznie. Uwzględnij zapotrzebowanie rynkowe na ten produkt, popularność. Lombard musi być zarobić na tym łatwo i szybko. Jeżeli uznasz, że ten przedmiot jest super łatwo sprzedaż z dużym zyskiem to wynik: 10, jeżeli ciężko i mały zysk to potencjał sprzedaży: 1",
+  "need_more_info": "wpisz '1' jeśli do wyceny potrzebujesz więcej informacji lub wpisz '0' jeśli nie potrzebujesz dodatkowych informacji, aby wycenić dokładnie produkt"
 }
 
 Zwróć tylko ten JSON. Żadnych opisów ani komentarzy.`
@@ -111,7 +112,8 @@ Zwróć tylko ten JSON. Żadnych opisów ani komentarzy.`
 		definitely: wynik.definitely,
 		condition: wynik.condition,
 		potential: wynik.potential,
-		status: wynik.status
+		status: wynik.status,
+		need_more_info: wynik.need_more_info
 	});
 
     res.send(quotationResponse.data);
