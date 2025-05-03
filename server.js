@@ -24,6 +24,7 @@ const upload = multer({
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 app.post("/app", upload.single("image"), async (req, res) => {
+	console.log(req);
 	
 	if (!req.file) return res.status(400).json({ error: "Brak zdjęcia." });
 	console.log("JEST OBRAZEK");
@@ -43,9 +44,6 @@ app.post("/app", upload.single("image"), async (req, res) => {
 				quotation_key: quotationKey
 			});
 			
-		}
-		else {
-			console.log("🆕 Nowa wycena (brak quotation_key)");
 		}
 
 		try {
