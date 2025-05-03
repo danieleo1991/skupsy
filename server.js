@@ -29,12 +29,14 @@ app.post("/app", upload.single("image"), async (req, res) => {
   try {
     const imageData = fs.readFileSync(req.file.path, { encoding: "base64" });
 	const imageHash = crypto.createHash("sha1").update(imageData).digest("hex");
+	const imageBase64 = `data:${mimeType};base64,${imageData}`;
     const mimeType = req.file.mimetype;
 	
 	try {
 		const check = await axios.post("https://stepmedia.pl/skupsy/app/check-hash-image.php", {
 			secret: "777",
-			image_hash: imageHash
+			image_hash: imageHash,
+			image_base64: imageBase64
 		});
 		if (check.data.status === "found") {
 			return res.send(check.data);
