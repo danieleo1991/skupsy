@@ -132,7 +132,7 @@ app.post("/app", upload.single("image"), async (req, res) => {
 								"used_item_price": "Wpisz średnią kwotę używanego przedmiotu widocznego na zdjęciu na podstawie danych z internetu i popularnych stron typu OLX.pl, Allegro.pl, Ceneo.pl",
 								"product_my_price": "Zwróć kwotę według wzoru:
 								Jeśli stan przedmiotu (czyli parametr 'condition') ma wartość '10' to wtedy kwotę, która znajduje się w 'used_item_price' pomniejsz o 70%, natomiast jeśli parametr 'condition' ma wartość '9' to pomniejsz o 75%, a jeśli parametr 'condition' ma wartość '8' to pomniejsz o 80%, a jeśli parametr 'condition' ma wartość '7' to pomniejsz o 85%, a jeśli parametr 'condition' ma wartość '6' to pomniejsz o 90%, a jeśli parametr 'condition' ma wartość '5' to pomniejsz o 95%, a jeśli parametr 'condition' ma wartość '4' to pomniejsz o 100%, a jeśli parametr 'condition' ma wartość '3' lub poniżej to pomniejsz o 110%.
-								Zwróć tylko kwotę np.: '200'.",
+								Kwotę ostateczną zaokrąglij w dół do pełnych setek (np. 114 zł -> 100 zł lub 67 zł -> 60 zł). Zwróć tylko kwotę np.: '200'.",
 								"need_more_info": "Wpisz '1' jeśli do wyceny potrzebujesz więcej informacji (np. ilość RAM itp.) lub wpisz '0' jeśli nie potrzebujesz dodatkowych informacji, aby wycenić dokładnie produkt ze zdjęcia.",
 								"photo_request": "Jeśli potrzebne jest dodatkowe zdjęcie - wpisz instrukcję jakie, np. 'Proszę o zdjęcie tabliczki znamionowej'. Jeśli niepotrzebne - pomiń to pole."
 							}
