@@ -10,7 +10,7 @@ const { OpenAI } = require("openai");
 const app = express();
 
 app.use(cors({
-	origin: 'https://stepmedia.pl',
+	origin: 'https://skupnet.pl',
 	methods: ['GET', 'POST'],
 	credentials: false
 }));
@@ -37,7 +37,7 @@ app.post("/app", upload.single("image"), async (req, res) => {
 		
 		if (quotationKey) {
 			
-			const quotation = await axios.post("https://stepmedia.pl/skupsy/app/get-quotation.php", {
+			const quotation = await axios.post("https://skupnet.pl/app/get-quotation.php", {
 				secret: "777",
 				quotation_key: quotationKey
 			});
@@ -150,7 +150,7 @@ app.post("/app", upload.single("image"), async (req, res) => {
 			});
 			
 			try {
-				const check = await axios.post("https://stepmedia.pl/skupsy/app/check-hash-image.php", {
+				const check = await axios.post("https://skupnet.pl/app/check-hash-image.php", {
 					secret: "777",
 					image_hash: imageHash
 				});
@@ -191,7 +191,7 @@ app.post("/app", upload.single("image"), async (req, res) => {
 			wynik = { error: "Nie udało się sparsować odpowiedzi GPT jako JSON." };
 		}
 	
-		const quotationResponse = await axios.post("https://stepmedia.pl/skupsy/app/quotation.php", {
+		const quotationResponse = await axios.post("https://skupnet.pl/app/quotation.php", {
 			secret: "777",
 			quotation_key: quotationKey,
 			image_hash: imageHash,
