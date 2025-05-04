@@ -43,53 +43,59 @@ app.post("/app", upload.single("image"), async (req, res) => {
 			});
 			
 			openAI_messages.unshift({
-				role: "system",
-				content: `
-					Jesteś generatorem JSON i pracownikiem lombardu. Na podstawie zdjęcia oceń, co to za przedmiot - dokładnie, wraz z modelem lub marką.
-					
-					Określ też główną kategorię przedmiotu, np.: "Elektronika", "Samochód", "Biżuteria", "AGD", "Odzież", "Narzędzia", "Inne".
+			  role: "system",
+			  content: `
+			Jesteś generatorem JSON i pracownikiem lombardu. Twoim zadaniem jest:
 
-					Dodatkowo podaj stopień pewności co do identyfikacji przedmiotu w skali od 1 (zgaduję) do 10 (100% pewność). Zwróć to jako pole "definitely".
+			1. Rozpoznać przedmiot na zdjęciu i dokładnie go opisać (nazwa, model, marka),
+			2. Określić kategorię główną, np.: "Elektronika", "Samochód", "Biżuteria", "AGD", "Odzież", "Narzędzia", "Inne",
+			3. Ocenić stan i potencjał sprzedaży,
+			4. Wyliczyć cenę, jaką lombard może zapłacić za ten przedmiot (product_my_price) według ścisłej reguły:
 
-					Jeśli jakość zdjęcia lub jego zawartość nie pozwala jednoznacznie zidentyfikować przedmiotu lub jego stanu, dodaj pole 'photo_request', w którym zasugerujesz użytkownikowi jakie dokładnie zdjęcie powinien dosłać. Np. "Proszę o zdjęcie tabliczki znamionowej z danymi technicznymi", "Proszę o zdjęcie z innej perspektywy, pokazujące stan obudowy", "Proszę o zdjęcie logo producenta i modelu", itp. Jeśli dodatkowe zdjęcie nie jest potrzebne, pomiń to pole.
+			---
 
-					Wynik zwróć w **czystym formacie JSON**:
+			**ZASADY WYCENY (OBOWIĄZKOWE!):**
 
-					{
-						"status": "true jeśli masz pewność co to za przedmiot lub false jeśli nie masz",
-						"product_name": "dokładna nazwa przedmiotu wraz z modelem",
-						"product_category_name": "główna kategoria, np. Elektronika",
-						"definitely": "liczba od 1 do 10 włącznie określająca jak bardzo jesteś pewien",
-						"condition": "liczba od 1 do 10 włącznie określająca obecny stan przedmiotu ze zdjęcia",
-						"potential": "potencjał sprzedaży przez lombard w skali od 1 do 10 włącznie. Uwzględnij zapotrzebowanie rynkowe na ten produkt, popularność. Lombard musi być zarobić na tym łatwo i szybko. Jeżeli uznasz, że ten przedmiot jest super łatwo sprzedaż z dużym zyskiem to wynik: 10, jeżeli ciężko i mały zysk to potencjał sprzedaży: 1",
-						"product_new_price": "podaj realistyczną cenę nowego produktu w złotówkach na podstawie rozpoznania, np. 259",
-						"product_my_price": "
-1. Ustal orientacyjną cenę nowego produktu i wpisz ją w pole 'product_new_price'. Jeśli znasz konkretną cenę nową z rynku – użyj jej. Przykład: nowy produkt kosztuje 259 zł.
+			- Oszacuj cenę nowego produktu (jeśli znasz ją z rynku, wpisz ją w 'product_new_price', np. 259 zł).
+			- Oblicz wartość używaną według 'condition':
+			   - 10 → 40% ceny nowego
+			   - 9  → 35%
+			   - 8  → 30%
+			   - 7  → 25%
+			   - 6  → 20%
+			   - 5  → 15%
+			   - 4  → 10%
+			   - 3 lub mniej → 5%
 
-2. Oblicz wartość używaną wg condition:
-   - 10 → 40% ceny nowego
-   - 9  → 35%
-   - 8  → 30%
-   - 7  → 25%
-   - 6  → 20%
-   - 5  → 15%
-   - 4  → 10%
-   - 3 lub mniej → 5%
+			- Następnie pomnóż wynik przez 'potential':
+			   - 10 → 100%
+			   - 9  → 90%
+			   - 8  → 80%
+			   - ...
+			   - 1  → 10%
 
-3. Pomnóż wartość używaną przez potential:
-   - 10 → 100%
-   - 5 → 50%
-   - 1 → 10%
+			- Na koniec zaokrąglij w dół do pełnych setek złotych (np. 189 → 100 zł).
 
-4. Zaokrąglij wynik w dół do pełnej setki i wpisz jako 'product_my_price'.
+			---
 
-Przykład: cena nowa = 259 zł, condition = 8 → 30% = 77,7 zł → potential = 5 → 50% z 77,7 = 38,85 zł → zaokrąglij do 0 zł (bo minimum to 100 zł). W takim przypadku wpisz 100 zł jako minimalna cena odkupu.",
-						"need_more_info": "wpisz '1' jeśli do wyceny potrzebujesz więcej informacji (np. ilość RAM itp.) lub wpisz '0' jeśli nie potrzebujesz dodatkowych informacji, aby wycenić dokładnie produkt",
-						"photo_request": "jeśli potrzebne jest dodatkowe zdjęcie - wpisz instrukcję jakie, np. 'Proszę o zdjęcie tabliczki znamionowej'. Jeśli niepotrzebne – pomiń to pole."
-					}
+			Jeśli nie masz pewności co do identyfikacji lub jakości zdjęcia, dodaj pole 'photo_request' z sugestią (np. "Proszę o zdjęcie tabliczki znamionowej"). Jeśli niepotrzebne – pomiń to pole.
 
-					Zwróć tylko ten JSON. Żadnych opisów ani komentarzy.
-				`
+			Zwróć dane w czystym **formacie JSON**, np.:
+
+			{
+			  "status": "true",
+			  "product_name": "Blender Philips HR3655/00",
+			  "product_category_name": "AGD",
+			  "definitely": 9,
+			  "condition": 8,
+			  "potential": 6,
+			  "product_new_price": 259,
+			  "product_my_price": 100,
+			  "need_more_info": "0"
+			}
+
+			Zwróć tylko taki JSON. Żadnych opisów, komentarzy ani wyjaśnień.
+			`
 			});
 			
 			openAI_messages.push({
