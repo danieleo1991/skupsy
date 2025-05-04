@@ -111,69 +111,70 @@ app.post("/app", upload.single("image"), async (req, res) => {
 		else {
 			
 			openAI_messages.push({
-				role: "user",
-				content: [
-					{
-						type: "text",
-						text: `Jesteś generatorem JSON i pracownikiem lombardu. Twoim zadaniem jest:
+  role: "user",
+  content: [
+    {
+      type: "text",
+      text: `
+Jesteś generatorem JSON i pracownikiem lombardu.
 
-1. Rozpoznać przedmiot na zdjęciu i dokładnie go opisać (nazwa, model, marka),
-2. Określić kategorię główną, np.: "Elektronika", "Samochód", "Biżuteria", "AGD", "Odzież", "Narzędzia", "Inne",
-3. Ocenić stan i potencjał sprzedaży,
-4. Wyliczyć cenę, jaką lombard może zapłacić za ten przedmiot (product_my_price) według ścisłej reguły:
+1. Rozpoznaj przedmiot na zdjęciu (nazwa, marka, model),
+2. Określ kategorię główną (np. Elektronika, Narzędzia, AGD, itd.),
+3. Oceń:
+   - 'definitely' (pewność rozpoznania 1–10),
+   - 'condition' (stan przedmiotu 1–10),
+   - 'potential' (łatwość sprzedaży 1–10).
 
----
+### OBLICZENIA (krok po kroku – NIE POMIJAJ!):
 
-**ZASADY WYCENY (OBOWIĄZKOWE!):**
+- 'product_new_price' – realna cena nowego produktu (z rynku),
+- 'used_percentage' – wg condition:
+  - 10 → 40%
+  - 9 → 35%
+  - 8 → 30%
+  - 7 → 25%
+  - 6 → 20%
+  - 5 → 15%
+  - 4 → 10%
+  - 3 lub mniej → 5%
 
-- Oszacuj cenę nowego produktu (jeśli znasz ją z rynku, wpisz ją w 'product_new_price', np. 259 zł).
-- Oblicz wartość używaną według 'condition':
-   - 10 → 40% ceny nowego
-   - 9  → 35%
-   - 8  → 30%
-   - 7  → 25%
-   - 6  → 20%
-   - 5  → 15%
-   - 4  → 10%
-   - 3 lub mniej → 5%
+- 'used_value' = product_new_price × used_percentage / 100
+- 'potential_percentage' – wg potential (10 = 100%, 1 = 10%)
+- 'adjusted_value' = used_value × potential_percentage / 100
+- 'product_my_price' = adjusted_value zaokrąglone w dół do pełnej setki (np. 186 → 100)
 
-- Następnie pomnóż wynik przez 'potential':
-   - 10 → 100%
-   - 9  → 90%
-   - 8  → 80%
-   - ...
-   - 1  → 10%
+Jeśli adjusted_value < 100 i przedmiot jest do odsprzedaży, wpisz minimum 100 zł.
 
-- Na koniec zaokrąglij w dół do pełnych setek złotych (np. 189 → 100 zł).
-
----
-
-Jeśli nie masz pewności co do identyfikacji lub jakości zdjęcia, dodaj pole 'photo_request' z sugestią (np. "Proszę o zdjęcie tabliczki znamionowej"). Jeśli niepotrzebne – pomiń to pole.
-
-Zwróć dane w czystym **formacie JSON**, np.:
+Zwróć dane tylko jako JSON:
 
 {
-  "status": "true",
-  "product_name": "Blender Philips HR3655/00",
-  "product_category_name": "AGD",
-  "definitely": 9,
-  "condition": 8,
-  "potential": 6,
-  "product_new_price": 259,
-  "product_my_price": 100,
-  "need_more_info": "0"
+  "status": "true" lub "false",
+  "product_name": "...",
+  "product_category_name": "...",
+  "definitely": ...,
+  "condition": ...,
+  "potential": ...,
+  "product_new_price": ...,
+  "used_percentage": ...,
+  "used_value": ...,
+  "potential_percentage": ...,
+  "adjusted_value": ...,
+  "product_my_price": ...,
+  "need_more_info": "0" lub "1",
+  "photo_request": "..." (opcjonalnie)
 }
 
-Zwróć tylko taki JSON. Żadnych opisów, komentarzy ani wyjaśnień.`
-				},
-				{
-					type: "image_url",
-					image_url: {
-						url: `data:${mimeType};base64,${imageData}`
-					}
-				}
-			  ]
-			});
+ZWRÓĆ TYLKO TEN JSON. Żadnych wyjaśnień ani komentarzy.
+      `
+    },
+    {
+      type: "image_url",
+      image_url: {
+        url: `data:${mimeType};base64,${imageData}`
+      }
+    }
+  ]
+});
 			
 			try {
 				const check = await axios.post("https://stepmedia.pl/skupsy/app/check-hash-image.php", {
