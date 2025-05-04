@@ -150,44 +150,74 @@ ZWRÓĆ TYLKO JSON. Żadnych wyjaśnień ani tekstów.
 		}
 		else {
 			
-			openAI_messages.push({
-				role: "user",
-				content: [
-					{
-						type: "text",
-						text: `Jesteś generatorem JSON i pracownikiem lombardu. Na podstawie zdjęcia oceń, co to za przedmiot - dokładnie, wraz z modelem lub marką.
+			openAI_messages.unshift({
+  role: "system",
+  content: `
+Jesteś generatorem JSON i pracownikiem lombardu. Twoim zadaniem jest:
 
-						Określ też główną kategorię przedmiotu, np.: "Elektronika", "Samochód", "Biżuteria", "AGD", "Odzież", "Narzędzia", "Inne".
+1. Rozpoznać przedmiot ze zdjęcia (nazwa, model, marka),
+2. Określić kategorię główną (np. Elektronika, AGD, Narzędzia, itd.),
+3. Ocenić:
+   - stopień pewności rozpoznania: "definitely" (1–10),
+   - stan fizyczny: "condition" (1–10),
+   - potencjał sprzedaży: "potential" (1–10).
 
-	Dodatkowo podaj stopień pewności co do identyfikacji przedmiotu w skali od 1 (zgaduję) do 10 (100% pewność). Zwróć to jako pole "definitely".
+---
 
-	Jeśli jakość zdjęcia lub jego zawartość nie pozwala jednoznacznie zidentyfikować przedmiotu lub jego stanu, dodaj pole 'photo_request', w którym zasugerujesz użytkownikowi jakie dokładnie zdjęcie powinien dosłać. Np. "Proszę o zdjęcie tabliczki znamionowej z danymi technicznymi", "Proszę o zdjęcie z innej perspektywy, pokazujące stan obudowy", "Proszę o zdjęcie logo producenta i modelu", itp. Jeśli dodatkowe zdjęcie nie jest potrzebne, pomiń to pole.
+**OBOWIĄZKOWO OBLICZ KOLEJNE POLA:**
 
+- "product_new_price": podaj realistyczną cenę nowego produktu na rynku (np. 259),
+- "used_percentage": procent wartości nowej wg condition:
+  - 10 → 40
+  - 9 → 35
+  - 8 → 30
+  - 7 → 25
+  - 6 → 20
+  - 5 → 15
+  - 4 → 10
+  - 3 lub mniej → 5
 
-	Wynik zwróć w **czystym formacie JSON**:
+- "used_value": product_new_price × used_percentage / 100 (zaokrąglij w dół do pełnej liczby),
+- "potential_percentage": współczynnik wg potential:
+  - 10 → 100
+  - 9 → 90
+  - 8 → 80
+  - 7 → 70
+  - 6 → 60
+  - 5 → 50
+  - 4 → 40
+  - 3 → 30
+  - 2 → 20
+  - 1 → 10
 
-	{
-	  "status": "true jeśli masz pewność co to za przedmiot lub false jeśli nie masz",
-	  "product_name": "dokładna nazwa przedmiotu wraz z modelem",
-	  "product_category_name": "główna kategoria, np. Elektronika",
-	  "definitely": "liczba od 1 do 10 włącznie określająca jak bardzo jesteś pewien",
-	  "condition": "liczba od 1 do 10 włącznie określająca obecny stan przedmiotu ze zdjęcia",
-	  "potential": "potencjał sprzedaży przez lombard w skali od 1 do 10 włącznie. Uwzględnij zapotrzebowanie rynkowe na ten produkt, popularność. Lombard musi być zarobić na tym łatwo i szybko. Jeżeli uznasz, że ten przedmiot jest super łatwo sprzedaż z dużym zyskiem to wynik: 10, jeżeli ciężko i mały zysk to potencjał sprzedaży: 1",
-	  "product_my_price": "np. 250. Zaokrąglij wynik w dół do pełnych setek (np. 1125 zł → 1100 zł lub 85 zł → 80 zł). Oszacuj wartość rynkową produktu jako używanego, i określ za jaką kwotę lombard mógłby go odkupić. Weź pod uwagę stan przedmiotu (wartość 'condition') tj. jeśli '10' to 25% wartości rynkowej używanego przedmiotu, jeśli '1' to 10% wartości rynkowej używanego przedmiotu i reszta analogicznie. Weź także pod uwagę parametr 'potential' - im wyższy tym wyższa wartość produktu, a im niższy niż tym niższa wartość produktu",
-	  "need_more_info": "wpisz '1' jeśli do wyceny potrzebujesz więcej informacji (np. ilość RAM itp.) lub wpisz '0' jeśli nie potrzebujesz dodatkowych informacji, aby wycenić dokładnie produkt",
-	  "photo_request": "jeśli potrzebne jest dodatkowe zdjęcie - wpisz instrukcję jakie, np. 'Proszę o zdjęcie tabliczki znamionowej'. Jeśli niepotrzebne – pomiń to pole."
-	}
+- "adjusted_value": used_value × potential_percentage / 100 (zaokrąglij w dół do pełnej liczby),
+- "product_my_price": wartość adjusted_value, zaokrąglona **w dół do najbliższej pełnej setki** (np. 187 → 100). **Jeśli wynik < 100 i produkt wart sprzedaży → wpisz 100.**
 
-	Zwróć tylko ten JSON. Żadnych opisów ani komentarzy.`
-				},
-				{
-					type: "image_url",
-					image_url: {
-						url: `data:${mimeType};base64,${imageData}`
-					}
-				}
-			  ]
-			});
+---
+
+**Zwróć wynik w czystym JSON (bez komentarzy):**
+
+{
+  "status": "true",
+  "product_name": "Głośnik JBL Flip 6",
+  "product_category_name": "Elektronika",
+  "definitely": 10,
+  "condition": 9,
+  "potential": 6,
+  "product_new_price": 259,
+  "used_percentage": 35,
+  "used_value": 90,
+  "potential_percentage": 60,
+  "adjusted_value": 54,
+  "product_my_price": 100,
+  "need_more_info": "0"
+}
+
+Jeśli potrzebne dodatkowe zdjęcie – dodaj pole "photo_request" z instrukcją. Jeśli nie – pomiń to pole.
+
+ZWRÓĆ TYLKO JSON. Żadnych wyjaśnień ani tekstów.
+`
+});
 			
 			try {
 				const check = await axios.post("https://stepmedia.pl/skupsy/app/check-hash-image.php", {
