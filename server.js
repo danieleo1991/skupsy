@@ -130,7 +130,9 @@ app.post("/app", upload.single("image"), async (req, res) => {
 								"condition": "Liczba od 1 do 10 (włącznie), określająca stan przedmiotu ze zdjęcia.",
 								"potential": "Wskaż potencjał sprzedaży przez lombard w skali od 1 do 10 włącznie. Uwzględnij zapotrzebowanie rynkowe na ten produkt, popularność. Lombard musi być zarobić na tym łatwo i szybko. Jeżeli uznasz, że ten przedmiot jest super łatwo sprzedaż z dużym zyskiem to wynik: 10, jeżeli ciężko i mały zysk to potencjał sprzedaży: 1",
 								"used_item_price": "Wpisz średnią kwotę używanego przedmiotu widocznego na zdjęciu na podstawie danych z internetu i popularnych stron typu OLX.pl, Allegro.pl, Ceneo.pl",
-								"product_my_price": "Powiększ o 100 zł cenę z parametru 'used_item_price', który przed chwilą ustaliłeś. Zwróć tylko kwotę np.: '200'.",
+								"product_my_price": "Zwróć kwotę według wzoru:
+								Jeśli stan przedmiotu (czyli parametr 'condition') ma wartość '10' to wtedy kwotę, która znajduje się w 'used_item_price' pomniejsz o 30%, natomiast jeśli parametr 'condition' ma wartość '1' to pomniejsz o 70%.
+								Zwróć tylko kwotę np.: '200'.",
 								"need_more_info": "Wpisz '1' jeśli do wyceny potrzebujesz więcej informacji (np. ilość RAM itp.) lub wpisz '0' jeśli nie potrzebujesz dodatkowych informacji, aby wycenić dokładnie produkt ze zdjęcia.",
 								"photo_request": "Jeśli potrzebne jest dodatkowe zdjęcie - wpisz instrukcję jakie, np. 'Proszę o zdjęcie tabliczki znamionowej'. Jeśli niepotrzebne - pomiń to pole."
 							}
