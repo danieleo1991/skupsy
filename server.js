@@ -62,7 +62,36 @@ app.post("/app", upload.single("image"), async (req, res) => {
 						"definitely": "liczba od 1 do 10 włącznie określająca jak bardzo jesteś pewien",
 						"condition": "liczba od 1 do 10 włącznie określająca obecny stan przedmiotu ze zdjęcia",
 						"potential": "potencjał sprzedaży przez lombard w skali od 1 do 10 włącznie. Uwzględnij zapotrzebowanie rynkowe na ten produkt, popularność. Lombard musi być zarobić na tym łatwo i szybko. Jeżeli uznasz, że ten przedmiot jest super łatwo sprzedaż z dużym zyskiem to wynik: 10, jeżeli ciężko i mały zysk to potencjał sprzedaży: 1",
-						"product_my_price": "np. 250. Zaokrąglij wynik w dół do pełnych setek (np. 1125 zł → 1100 zł lub 85 zł → 80 zł). Oszacuj wartość rynkową produktu jako używanego, i określ za jaką kwotę lombard mógłby go odkupić. Weź pod uwagę stan przedmiotu (wartość 'condition') tj. jeśli '10' to 20% wartości rynkowej używanego przedmiotu, jeśli '1' to 5% wartości rynkowej używanego przedmiotu i reszta analogicznie. Weź także pod uwagę parametr 'potential' - im wyższy tym wyższa wartość produktu, a im niższy niż tym niższa wartość produktu",
+						"product_my_price": "
+							Wzór:
+
+							1. Najpierw oszacuj realistyczną **wartość rynkową używanego** produktu na podstawie ceny nowego i stanu ('condition'):
+							   - condition = 10 → 40% ceny nowego produktu
+							   - condition = 9  → 35%
+							   - condition = 8  → 30%
+							   - condition = 7  → 25%
+							   - condition = 6  → 20%
+							   - condition = 5  → 15%
+							   - condition = 4  → 10%
+							   - condition = 3 lub niżej → 5%
+
+							2. Następnie pomnóż uzyskaną wartość przez współczynnik wynikający z 'potential' (czyli łatwości i opłacalności sprzedaży):
+							   - potential = 10 → 100% tej wartości
+							   - potential = 9  → 90%
+							   - potential = 8  → 80%
+							   - potential = 7  → 70%
+							   - potential = 6  → 60%
+							   - potential = 5  → 50%
+							   - potential = 4  → 40%
+							   - potential = 3  → 30%
+							   - potential = 2  → 20%
+							   - potential = 1  → 10%
+
+							3. Wynik końcowy zaokrąglij **w dół** do pełnych setek (np. 365 zł → 300 zł, 820 zł → 800 zł).
+
+							Przykład: Produkt nowy kosztuje 1000 zł, condition = 9 → wartość używana = 350 zł, potential = 6 → płacimy 60% z 350 zł = 210 zł → zaokrąglamy do 200 zł.
+
+							To zapewnia bezpieczny margines zysku i szybki obrót towarem.",
 						"need_more_info": "wpisz '1' jeśli do wyceny potrzebujesz więcej informacji (np. ilość RAM itp.) lub wpisz '0' jeśli nie potrzebujesz dodatkowych informacji, aby wycenić dokładnie produkt",
 						"photo_request": "jeśli potrzebne jest dodatkowe zdjęcie - wpisz instrukcję jakie, np. 'Proszę o zdjęcie tabliczki znamionowej'. Jeśli niepotrzebne – pomiń to pole."
 					}
