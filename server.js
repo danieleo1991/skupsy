@@ -111,70 +111,41 @@ app.post("/app", upload.single("image"), async (req, res) => {
 		else {
 			
 			openAI_messages.push({
-  role: "user",
-  content: [
-    {
-      type: "text",
-      text: `
-Jesteś generatorem JSON i pracownikiem lombardu.
+				role: "user",
+				content: [
+					{
+						type: "text",
+						text: `
+							Jesteś generatorem JSON i pracownikiem lombardu. Na podstawie zdjęcia oceń, co to za przedmiot - dokładnie, wraz z modelem lub marką.
 
-1. Rozpoznaj przedmiot na zdjęciu (nazwa, marka, model),
-2. Określ kategorię główną (np. Elektronika, Narzędzia, AGD, itd.),
-3. Oceń:
-   - 'definitely' (pewność rozpoznania 1–10),
-   - 'condition' (stan przedmiotu 1–10),
-   - 'potential' (łatwość sprzedaży 1–10).
+							Jeśli jakość zdjęcia lub jego zawartość nie pozwala jednoznacznie zidentyfikować przedmiotu lub jego stanu, dodaj pole 'photo_request', w którym zasugerujesz użytkownikowi jakie dokładnie zdjęcie powinien dosłać. Np. "Proszę o zdjęcie tabliczki znamionowej z danymi technicznymi", "Proszę o zdjęcie z innej perspektywy, pokazujące stan obudowy", "Proszę o zdjęcie logo producenta i modelu", itp. Jeśli dodatkowe zdjęcie nie jest potrzebne, pomiń to pole.
 
-### OBLICZENIA (krok po kroku – NIE POMIJAJ!):
+							Wynik zwróć w **czystym formacie JSON**:
 
-- 'product_new_price' – realna cena nowego produktu (z rynku),
-- 'used_percentage' – wg condition:
-  - 10 → 40%
-  - 9 → 35%
-  - 8 → 30%
-  - 7 → 25%
-  - 6 → 20%
-  - 5 → 15%
-  - 4 → 10%
-  - 3 lub mniej → 5%
+							{
+								"status": "Zwróć 'true' jeśli masz pewność co to za przedmiot lub 'false' jeśli nie masz.",
+								"product_name": "Dokładna nazwa przedmiotu wraz z modelem lub marką.",
+								"product_category_name": "Określ główną kategorię przedmiotu, np.: 'Elektronika', 'Samochód', 'Biżuteria', 'AGD', 'Odzież", 'Narzędzia', 'Inne'.",
+								"definitely": "Podaj stopień pewności co do identyfikacji przedmiotu w skali od 1 (zgaduję) do 10 (100% pewność).",
+								"condition": "Liczba od 1 do 10 (włącznie), określająca stan przedmiotu ze zdjęcia.",
+								"potential": "Wskaż potencjał sprzedaży przez lombard w skali od 1 do 10 włącznie. Uwzględnij zapotrzebowanie rynkowe na ten produkt, popularność. Lombard musi być zarobić na tym łatwo i szybko. Jeżeli uznasz, że ten przedmiot jest super łatwo sprzedaż z dużym zyskiem to wynik: 10, jeżeli ciężko i mały zysk to potencjał sprzedaży: 1",
+								"used_item_price": "Wpisz średnią kwotę używanego przedmiotu widocznego na zdjęciu na podstawie danych z internetu i popularnych stron typu OLX.pl, Allegro.pl, Ceneo.pl",
+								"product_my_price": "Powiększ o 100 zł cenę z parametru 'used_item_price', który przed chwilą ustaliłeś. Zwróć tylko kwotę np.: '200'.",
+								"need_more_info": "Wpisz '1' jeśli do wyceny potrzebujesz więcej informacji (np. ilość RAM itp.) lub wpisz '0' jeśli nie potrzebujesz dodatkowych informacji, aby wycenić dokładnie produkt ze zdjęcia.",
+								"photo_request": "Jeśli potrzebne jest dodatkowe zdjęcie - wpisz instrukcję jakie, np. 'Proszę o zdjęcie tabliczki znamionowej'. Jeśli niepotrzebne - pomiń to pole."
+							}
 
-- 'used_value' = product_new_price × used_percentage / 100
-- 'potential_percentage' – wg potential (10 = 100%, 1 = 10%)
-- 'adjusted_value' = used_value × potential_percentage / 100
-- 'product_my_price' = adjusted_value zaokrąglone w dół do pełnej setki (np. 186 → 100)
-
-Jeśli adjusted_value < 100 i przedmiot jest do odsprzedaży, wpisz minimum 100 zł.
-
-Zwróć dane tylko jako JSON:
-
-{
-  "status": "true" lub "false",
-  "product_name": "...",
-  "product_category_name": "...",
-  "definitely": ...,
-  "condition": ...,
-  "potential": ...,
-  "product_new_price": ...,
-  "used_percentage": ...,
-  "used_value": ...,
-  "potential_percentage": ...,
-  "adjusted_value": ...,
-  "product_my_price": ...,
-  "need_more_info": "0" lub "1",
-  "photo_request": "..." (opcjonalnie)
-}
-
-ZWRÓĆ TYLKO TEN JSON. Żadnych wyjaśnień ani komentarzy.
-      `
-    },
-    {
-      type: "image_url",
-      image_url: {
-        url: `data:${mimeType};base64,${imageData}`
-      }
-    }
-  ]
-});
+							Zwróć tylko ten JSON. Żadnych opisów ani komentarzy.
+						`
+					},
+					{
+						type: "image_url",
+						image_url: {
+							url: `data:${mimeType};base64,${imageData}`
+						}
+					}
+				]
+			});
 			
 			try {
 				const check = await axios.post("https://stepmedia.pl/skupsy/app/check-hash-image.php", {
